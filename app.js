@@ -10,10 +10,23 @@ app.get("/",(req,res,next)=>{
 const key = process.env.MY_KEY;
 const url = `https://api.openweathermap.org/data/2.5/weather?lat=44.34&lon=10.99&appid=${key}`;
 
-    https.get(url, (res)=>{
-        console.log(res.statusCode)
+    https.get(url, (response)=>{
+        console.log(res.statusCode);
+        response.on("data", (data)=>{
+          const weatherData = JSON.parse(data)
+          const temp = weatherData.main.temp;
+          const weatherDescription= weatherData.weather[0].description;
+          const icon = weatherData.weather[0].icon;
+          const imageUrl= `http://openweathermap.org/img/wn/${icon}@2x.png`
+
+          res.write(`<h1>The temperature in London is ${temp} degrees Celcius </h1>`);
+          res.write(`<p>the weather is currently  ${weatherDescription}</p>`);
+          res.write(`<img src="${imageUrl}"/>`)
+          res.send()
+
+        })
     })
-    res.send(`<h1>Hello World!</h1>`);
+    
 })
 
 app.listen(PORT, ()=>{
